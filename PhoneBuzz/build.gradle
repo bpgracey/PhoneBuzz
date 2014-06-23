@@ -17,7 +17,7 @@ version = '0.0.1-SNAPSHOT'
 
 manifest.mainAttributes("Main-Class" : "com.bpgracey.phonebuzz.Rest")
 
-description = """PhoneBuzz"""
+description = """PhoneBuzz: FizzBuzz by phone!"""
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
@@ -27,13 +27,12 @@ project.ext.scala          = '2.10.4'
 project.ext.scalaM         = '2.10'
 project.ext.akka           = '2.3.2'
 project.ext.spray          = '1.3.1'
-project.ext.json           = '1.2.5' // for Spray Json
 project.ext.config         = '1.2.0'
 project.ext.testkit        = '2.3.11'  // for Specs2
-project.ext.junitInterface = '0.10'
 project.ext.slf4j          = '1.7.7'
 project.ext.scalaLog       = '2.1.2'
 project.ext.log            = '1.2.17'
+project.ext.twilio         = '3.4.5'
 
 repositories {
 	mavenLocal()
@@ -50,13 +49,13 @@ dependencies {
 	// Spray
     compile group: 'io.spray',                   name: 'spray-can',                   version: spray
     compile group: 'io.spray',                   name: 'spray-routing',               version: spray
+	// Twilio
+	compile group: 'com.twilio.sdk',             name: 'twilio-java-sdk',             version: twilio
 	// Logging
     compile group: 'com.typesafe.scala-logging', name: "scala-logging-slf4j_$scalaM", version: scalaLog
     compile group: 'org.slf4j',                  name: 'slf4j-api',                   version: slf4j
     compile group: 'org.slf4j',                  name: 'slf4j-log4j12',               version: slf4j
     compile group: 'log4j',                      name: 'log4j',                       version: log
-	// Json
-    compile group: 'io.spray',                   name: "spray-json_$scalaM",          version: json
 	// Typesafe config
     compile group: 'com.typesafe',               name: 'config',                      version: config
 	
@@ -66,7 +65,6 @@ dependencies {
     testCompile group: 'io.spray',          name: 'spray-testkit',        version: spray
 	// Test - Scala (may change!)
     testCompile group: 'org.specs2',        name: "specs2_$scalaM",       version: testkit
-    testCompile group: 'com.novocode',      name: 'junit-interface',      version: junitInterface
 
 }
 

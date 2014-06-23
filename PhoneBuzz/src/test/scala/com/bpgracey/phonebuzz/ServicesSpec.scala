@@ -62,3 +62,30 @@ class PhoneSpec extends Specification with Specs2RouteTest with PhoneRoute {
 		}
 	}
 }
+
+@RunWith(classOf[JUnitRunner])
+class MainSpec extends Specification with Specs2RouteTest {
+	sequential
+	
+	"Initial call" should {
+		"reply with the default answer" in {
+			Get("/phonebuzz/call") ~> MainService.route ~> check {
+				status mustEqual StatusCodes.OK
+				responseAs[String] must contain("""Please enter a number between 1 and 45""")
+			}
+		}
+	}
+	
+	"Main call" should {
+		"process a correct response" in {
+			Get("/phonebuzz/number?Digits=16") ~> MainService.route ~> check {
+				status mustEqual StatusCodes.OK
+				responseAs[NodeSeq] \ "Say" map (_.text) mustEqual Seq("""I heard 16. The Fizz Buzz list from 1 to 16 is:""",
+						"1.", "2.", "Fizz.", "4.", "Buzz.",
+					"Fizz.", "7.", "8.", "Fizz.", "Buzz.", 
+					"11.", "Fizz.", "13.", "14.", "Fizz Buzz.", "16.",
+					"Goodbye!")
+			}
+		}
+	}
+}

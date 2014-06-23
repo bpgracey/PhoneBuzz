@@ -23,8 +23,8 @@ class MainService(route: Route) extends HttpServiceActor with ActorLogging {
 }
 
 object MainService extends PhoneRoute with LazyLogging {
-	def route = 
-		pathPrefix("/phonebuzz") {
+	val route = 
+		pathPrefix("phonebuzz") {
 			phoneRoute
 		} ~
 		complete(NotFound)
