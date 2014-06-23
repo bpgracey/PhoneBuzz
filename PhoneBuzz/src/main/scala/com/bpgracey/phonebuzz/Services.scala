@@ -2,14 +2,11 @@ package com.bpgracey.phonebuzz
 
 import com.typesafe.scalalogging.slf4j.LazyLogging
 import akka.actor.ActorLogging
-import spray.http.StatusCodes._
 import spray.httpx.marshalling.ToResponseMarshallable.isMarshallable
-import spray.routing.Directives
-import spray.routing.HttpServiceActor
-import spray.routing.Route
-import spray.routing.RejectionHandler
-import spray.routing.MissingQueryParamRejection
-import spray.routing.MalformedQueryParamRejection
+import spray.routing.{Directives, HttpServiceActor, Route, RejectionHandler, MissingQueryParamRejection}
+import com.twilio.sdk.{TwilioRestClient}
+import collection.JavaConverters._
+import spray.http.StatusCodes._
 import com.bpgracey.fizzbuzz._
 import Config._
 import spray.http.MediaTypes
@@ -22,12 +19,66 @@ class MainService(route: Route) extends HttpServiceActor with ActorLogging {
 	def receive: Receive = runRoute(route)
 }
 
-object MainService extends PhoneRoute with LazyLogging {
+object MainService extends PhoneRoute with CallRoute with LazyLogging {
 	val route = 
 		pathPrefix("phonebuzz") {
+			callRoute ~
 			phoneRoute
 		} ~
 		complete(NotFound)
+}
+
+trait CallRoute extends Directives with LazyLogging {
+	lazy val client = new TwilioRestClient(twilioSid, twilioToken)
+	lazy val callFactory = client.getAccount().getCallFactory()
+	val callRoute =
+		pathEndOrSingleSlash {
+			(get | post) {
+				complete {
+<html>
+  <head>
+    <title>PhoneBuzz - Fizzbuzz by Phone!</title>
+  </head>
+  <body>
+    <h1>PhoneBuzz!</h1>
+    <form method="get" action="/phonebuzz/makecall">
+      Phone number to call you at:
+      <input type="text" name="phone" />
+      <button type="submit">Call me!</button>
+    </form>
+  </body>
+</html>
+				}
+			}
+	} ~
+	path("makecall") {
+		(get | post) {
+			anyParam('phone) { phone =>
+				complete {
+					val callParams = Map[String, String](
+							"To" -> phone, 
+							"From" -> twilioPhone, 
+							"Url" -> "/phonebuzz/call").asJava
+					val call = callFactory.create(callParams)
+					val callSid = call.getSid()
+<html>
+  <head>
+    <title>PhoneBuzz - Fizzbuzz by Phone!</title>
+  </head>
+  <body>
+    <h1>PhoneBuzz!</h1>
+    <form method="get" action="/phonebuzz/makecall">
+      Phone number to call you at:
+      <input type="text" name="phone" value="{phone}" />
+      <button type="submit">Call me!</button>
+    </form>
+    <p>Your call has been placed!<br/>Your SID is {callSid}</p>
+  </body>
+</html>
+				}
+			}
+		}
+	}
 }
 
 case class PhoneReq(number: Int)
