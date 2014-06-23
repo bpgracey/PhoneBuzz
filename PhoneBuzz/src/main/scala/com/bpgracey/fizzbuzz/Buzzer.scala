@@ -1,6 +1,9 @@
 package com.bpgracey.fizzbuzz
 
+import com.bpgracey.phonebuzz.Config
+
 object fizzBuzzer {
+	import Config._
 	implicit class FizzBuzz(number: Int) {
 		lazy val isFizz = number % 3 == 0
 		lazy val isBuzz = number % 5 == 0
@@ -11,5 +14,11 @@ object fizzBuzzer {
 			else if (isBuzz) "Buzz"
 			else number toString
 		}
+		def fizzBuzzTo(): Seq[String] = {
+			require(number > 0)
+			require(number <= max)
+			(1 to number) map {_ fizzBuzz}
+		}
 	}
+	
 }

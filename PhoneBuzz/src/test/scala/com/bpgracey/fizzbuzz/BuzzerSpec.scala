@@ -61,5 +61,20 @@ class BuzzerSpec extends Specification {
 			5.fizzBuzz mustEqual "Buzz"
 			15.fizzBuzz mustEqual "Fizz Buzz"
 		}
+		
+		"Cope with negatives" in {
+			-3.fizzBuzz mustEqual "Fizz"
+			-15.fizzBuzz mustEqual "Fizz Buzz"
+			0.fizzBuzz mustEqual "Fizz Buzz"
+			-22.fizzBuzz mustEqual "-22"
+		}
+	}
+	
+	"FizzBuzzTo" should {
+		"provide the correct list" in {
+			16.fizzBuzzTo mustEqual Seq("1", "2", "Fizz", "4", "Buzz",
+					"Fizz", "7", "8", "Fizz", "Buzz", 
+					"11", "Fizz", "13", "14", "Fizz Buzz", "16")
+		}
 	}
 }
