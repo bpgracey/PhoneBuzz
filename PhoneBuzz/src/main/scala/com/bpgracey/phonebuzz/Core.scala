@@ -1,12 +1,12 @@
 package com.bpgracey.phonebuzz
 
-import akka.actor.ActorSystem
-import akka.actor.Props
+import com.typesafe.scalalogging.slf4j.LazyLogging
+import akka.actor.{ActorSystem, Props, actorRef2Scala}
 import akka.io.IO
 import spray.can.Http
-import com.typesafe.scalalogging.slf4j.LazyLogging
+import java.security.{KeyStore, SecureRandom}
+import javax.net.ssl.{KeyManagerFactory, SSLContext, TrustManagerFactory}
 import Config._
-import akka.actor.actorRef2Scala
 
 /*
  *  entry point for REPL
@@ -33,7 +33,7 @@ trait CoreActors {
 /*
  * Actor system instantiation
  */
-trait BootedCore extends Core with LazyLogging {
+trait BootedCore extends Core with CoreSSLConfiguration with LazyLogging {
 	logger.info("Actor system {}", actorsystem)
 	implicit lazy val system = ActorSystem(actorsystem)
 	sys.addShutdownHook(system.shutdown)
@@ -58,4 +58,30 @@ trait Web extends LazyLogging {
 
 	logger.info(s"Binding to $bind:$port")
 	IO(Http)(system) ! Http.Bind(service, bind, port = port)
+}
+
+/*
+ * SSL support
+ */
+trait CoreSSLConfiguration extends LazyLogging {
+	implicit def sslContext: SSLContext = {
+		val keyStoreResource = keystore
+		val passchar = password toCharArray
+		
+		val keyStoreType = "jks"
+		val factoryType = "SunX509"
+		val sslContextType = "TLS"
+		
+		logger.info("Opening keystore {}", keyStoreResource)
+		val keyStore = KeyStore.getInstance(keyStoreType)
+		keyStore.load(getClass.getResourceAsStream(keyStoreResource), passchar)
+		val keyManagerFactory = KeyManagerFactory.getInstance(factoryType)
+		keyManagerFactory.init(keyStore, passchar)
+		val trustManagerFactory = TrustManagerFactory.getInstance(factoryType)
+		trustManagerFactory.init(keyStore)
+		val context = SSLContext.getInstance(sslContextType)
+		context.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(), new SecureRandom)
+		logger.info("Context opened")
+		context
+	}
 }

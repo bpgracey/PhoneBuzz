@@ -13,6 +13,8 @@ object Config extends LazyLogging {
   }
   lazy val bind = getString("bind.ip")
   lazy val actorsystem = getString("actor.system")
+  lazy val keystore = getString("ssl.keystore")
+  lazy val password = getString("ssl.password")
   
   def getInt(k: String) = {
   	val v = config.getInt(k)
