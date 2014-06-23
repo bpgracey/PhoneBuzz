@@ -7,11 +7,12 @@ import org.specs2.runner.JUnitRunner
 @RunWith(classOf[JUnitRunner])
 class AnswersSpec extends Specification {
 	import Answer._
+	sequential
 	
 	"BadNumber" should {
 		"give the right message" in {
 			val say = badNumber(5) \ "Say"
-			say.text must contain("""I'm sorry, I heard 5, which is more than 50. Goodbye!""")
+			say.text must contain("""I'm sorry, I heard 5, which is more than 45. Goodbye!""")
 		}
 	}
 	

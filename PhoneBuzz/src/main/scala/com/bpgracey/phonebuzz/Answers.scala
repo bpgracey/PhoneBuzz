@@ -29,7 +29,7 @@ object Answer {
 	
 	val firstAnswer =
 <Response>
-    <Gather action="/phonebuzz/number" method="POST" timeout="10" finishOnKey="#">
+    <Gather action="/phonebuzz/number" method="GET" timeout="10" finishOnKey="#">
         <Say>
             Please enter a number between 1 and {max},
             followed by the pound sign
